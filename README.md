@@ -1,3 +1,7 @@
+> ## :warning: Upgrade from v2!
+>
+> The v2 version of this action [has stopped working](https://github.com/pnpm/action-setup/issues/135) with newer Node.js versions. Please, upgrade to the latest version to fix any issues.
+
 # Setup pnpm
 
 Install pnpm package manager.
@@ -60,7 +64,9 @@ Location of `pnpm` and `pnpx` command.
 
 ## Usage example
 
-### Just install pnpm
+### Install only pnpm without `packageManager`
+
+This works when the repo either doesn't have a `package.json` or has a `package.json` but it doesn't specify `packageManager`.
 
 ```yaml
 on:
@@ -72,9 +78,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
           version: 8
+```
+
+###  Install only pnpm with `packageManager`
+
+Omit `version` input to use the version in the [`packageManager` field in the `package.json`](https://nodejs.org/api/corepack.html).
+
+```yaml
+on:
+  - push
+  - pull_request
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: pnpm/action-setup@v4
 ```
 
 ### Install pnpm and a few npm packages
@@ -89,9 +112,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
           version: 8
           run_install: |
@@ -113,31 +136,19 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
           version: 8
           run_install: false
 
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - uses: actions/cache@v3
-        name: Setup pnpm cache
+      - name: Install Node.js
+        uses: actions/setup-node@v4
         with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          node-version: 20
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install
@@ -151,4 +162,4 @@ This action does not setup Node.js for you, use [actions/setup-node](https://git
 
 ## License
 
-[MIT](https://git.io/JfclH) © [Hoàng Văn Khải](https://github.com/KSXGitHub/)
+[MIT](https://github.com/pnpm/action-setup/blob/master/LICENSE.md) © [Hoàng Văn Khải](https://github.com/KSXGitHub/)
